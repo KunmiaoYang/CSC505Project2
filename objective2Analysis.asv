@@ -1,0 +1,22 @@
+%% data
+scale = 1e5;
+n = length(sizes);
+A = [sizes/scale; ones(1,n)]';
+Als = (A'*A)\A';
+Ct = Als*times'/scale
+Cc = Als*comparisons'/scale
+
+%% time
+plot(sizes, times, '-xb', sizes, Ct()*sizes, '-or');
+
+%% comparison
+plot(sizes, comparisons, '-xb', sizes, Cc*sizes, '-or');
+
+%% time-comparison
+plot(comparisons, times, '-ob')
+
+%% postprocess
+grid on;
+ax = gca;
+% ax.XScale = 'log';
+% ax.YScale = 'log';

@@ -5,12 +5,12 @@ import java.io.PrintStream;
 import java.util.*;
 
 public class Main {
-    private static final int[] ARRAY_SIZES = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    private static final int[] ARRAY_SIZES = {100000, 200000, 400000, 800000, 1600000, 3200000, 6400000};
 //    private static final int[] ARRAY_SIZES = {100000, 200000, 400000};
     private static final int[] ARRAY_SIZES_FOR_INSERTION_SORT = {1000, 2000, 4000, 8000, 16000, 32000, 64000};
     private static final int[] SAMPLE_SIZES_FOR_INSERTION_SORT = {100, 100, 10, 10, 10, 10, 10};
     private static final int[] SAMPLE_SIZES_FOR_SORTED_INSERTION_SORT = {1024, 512, 256, 128, 64, 32, 16};
-    private static final int SAMPLE_SIZE = 100;
+    private static final int SAMPLE_SIZE = 20;
     private static final String SEPARATOR_MAIN = " -------------------------------------- ";
     private static final String SEPARATOR_SUB = " ************************************* ";
 
@@ -163,7 +163,7 @@ public class Main {
         System.out.println("comparisons = " + quickSelect.comp.getCount());
     }
 
-    static void testMedianOutperform(RecordComparator comp, int[] arraySize, ArrayFactory arrayFactory, PrintStream out, String title) {
+    static void testMedianOutperform(RecordComparator comp, int[] arraySize, int sampleSize, ArrayFactory arrayFactory, PrintStream out, String title) {
         Median[] medians = new Median[2];
         medians[0] = new QuickSelect(comp);
         medians[1] = new JavaSort(comp);
@@ -174,22 +174,24 @@ public class Main {
         for(int i = 0; i < times.length; i++) comparisons[i] = new double[arraySize.length];
 
         out.println("%%" + SEPARATOR_MAIN + title + SEPARATOR_MAIN);
+        out.println("clear;");
         out.print("sizes = ");
         out.println(Arrays.toString(arraySize) + ";");
 
         for (int j = 0; j<2; j++) {
             for(int k = 0; k < arraySize.length; k++) {
-                Integer[][] arrays = new Integer[SAMPLE_SIZE][];
-                for(int i = 0; i < SAMPLE_SIZE; i++) arrays[i] = arrayFactory.createArray(arraySize[k]);
+                System.out.println("Array size = " + arraySize[k]);
+                Integer[][] arrays = new Integer[sampleSize][];
+                for(int i = 0; i < sampleSize; i++) arrays[i] = arrayFactory.createArray(arraySize[k]);
                 long startTime, endTime;
                 comp.setCount(0);
                 startTime= System.currentTimeMillis();
-                for(int i = 0; i < SAMPLE_SIZE; i++) {
+                for(int i = 0; i < sampleSize; i++) {
                     medians[j].findMedian(arrays[i]);
                 }
                 endTime= System.currentTimeMillis();
-                times[j][k] = (endTime-startTime)/(double) SAMPLE_SIZE;
-                comparisons[j][k] = comp.getCount()/(double) SAMPLE_SIZE;
+                times[j][k] = (endTime-startTime)/(double) sampleSize;
+                comparisons[j][k] = comp.getCount()/(double) sampleSize;
             }
 
             // Output
@@ -207,9 +209,62 @@ public class Main {
         for(Median median: medians) out.print(median.getClass().getName() + "_comparisons; ");
         out.print("];");
     }
+    
+    static void testQuickSelectConstant(RecordComparator comp, int[] arraySize, int sampleSize, ArrayFactory arrayFactory, PrintStream out, String title) {
+        QuickSelect quickSelect = new QuickSelect(comp);
+
+        double[] times = new double[arraySize.length];
+        double[] comparisons = new double[arraySize.length];
+        for (int j = 0; j < arraySize.length; times[j] = 0.0, comparisons[j] = 0.0, j++);
+        
+//        for(int j = 0; j < arraySize.length; j++) {
+//            Integer[][] arrays = new Integer[sampleSize][];
+//            for(int i = 0; i < sampleSize; i++) arrays[i] = arrayFactory.createArray(arraySize[j]);
+//            long startTime, endTime;
+//            comp.setCount(0);
+//            startTime= System.currentTimeMillis();
+//            for(int i = 0; i < sampleSize; i++) quickSelect.findMedian(arrays[i]);
+//            endTime= System.currentTimeMillis();
+//            times[j] = (endTime-startTime)/(double) sampleSize;
+//            comparisons[j] = comp.getCount()/(double) sampleSize;
+//            System.out.println("array size = " + arraySize[j]);
+//        }
+
+        for (int i = 0; i < sampleSize; i++) {
+            System.out.print("sample: " + i);
+            for(int j = 0; j < arraySize.length; j++) {
+                Integer[] arrays = arrayFactory.createArray(arraySize[j]);
+                long startTime, endTime;
+                comp.setCount(0);
+                startTime= System.currentTimeMillis();
+                quickSelect.findMedian(arrays);
+                endTime= System.currentTimeMillis();
+                times[j] += (endTime-startTime);
+                comparisons[j] += comp.getCount();
+                System.out.print(".");
+            }
+            System.out.println();
+        }
+        for(int j = 0; j < arraySize.length; j++) {
+            times[j] /= (double) sampleSize;
+            comparisons[j] /= (double) sampleSize;
+        }
+
+        out.println("%%" + SEPARATOR_MAIN + title + SEPARATOR_MAIN);
+        out.println("clear;");
+        out.print("sizes = ");
+        out.println(Arrays.toString(arraySize) + ";");
+        out.print("times = ");
+        out.println(Arrays.toString(times) + ";");
+        out.print("comparisons = ");
+        out.println(Arrays.toString(comparisons) + ";");
+        out.println("%%" + SEPARATOR_MAIN + "Summary" + SEPARATOR_MAIN);
+        out.print("data = [sizes; times; comparisons];");
+    }
 
     public static void main(String[] args) throws Throwable {
-        PrintStream ps = new PrintStream(new BufferedOutputStream(new FileOutputStream("objective1.m")));
+        //region Init
+        PrintStream ps = new PrintStream(new BufferedOutputStream(new FileOutputStream("objective3.m")));
         RecordComparator comp = new RecordComparator();
         Sort insertSort = new InsertionSort(comp), mergeSort = new MergeSort(comp),
                 heapSort = new HeapSort(comp), javaSort = new JavaSort(comp),
@@ -218,6 +273,7 @@ public class Main {
                 sortGroup3[] = {insertSort},
                 tempGroup[] = {mergeSort};
         QuickSelect quickSelect = new QuickSelect(comp);
+        //endregion
 
         //region program 1
         //        testArrayCorrection(new MergeSort(comp));
@@ -230,7 +286,9 @@ public class Main {
         //endregion
 
 //        testQuickSelect(quickSelect);
-        testMedianOutperform(comp, ARRAY_SIZES, ArrayFactory.getRandomFactory(), ps, "Objective 1");
+        testMedianOutperform(comp, ARRAY_SIZES, SAMPLE_SIZE, ArrayFactory.getRandomFactory(), ps, "Objective 1");
+//        testQuickSelectConstant(comp, ARRAY_SIZES, SAMPLE_SIZE, ArrayFactory.getRandomFactory(), ps, "Objective 2");
+
         ps.close();
     }
 }
