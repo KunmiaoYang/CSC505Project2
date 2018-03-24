@@ -5,12 +5,14 @@ import java.io.PrintStream;
 import java.util.*;
 
 public class Main {
-    private static final int[] ARRAY_SIZES = {100000, 200000, 400000, 800000, 1600000, 3200000, 6400000};
+    private static final int[] ARRAY_SIZES_4_SAW = {2,4,8,12,16,20,24,28,32,34,36,38,40,42,44,46};
+    private static final int[] ARRAY_SIZES = {1,2,3,4,5,6,7,8,9,10};
+//    private static final int[] ARRAY_SIZES = {500, 1000, 2000, 4000, 8000, 16000, 32000, 64000};
 //    private static final int[] ARRAY_SIZES = {100000, 200000, 400000};
     private static final int[] ARRAY_SIZES_FOR_INSERTION_SORT = {1000, 2000, 4000, 8000, 16000, 32000, 64000};
     private static final int[] SAMPLE_SIZES_FOR_INSERTION_SORT = {100, 100, 10, 10, 10, 10, 10};
     private static final int[] SAMPLE_SIZES_FOR_SORTED_INSERTION_SORT = {1024, 512, 256, 128, 64, 32, 16};
-    private static final int SAMPLE_SIZE = 20;
+    private static final int SAMPLE_SIZE = 10000;
     private static final String SEPARATOR_MAIN = " -------------------------------------- ";
     private static final String SEPARATOR_SUB = " ************************************* ";
 
@@ -163,10 +165,10 @@ public class Main {
         System.out.println("comparisons = " + quickSelect.comp.getCount());
     }
 
-    static void testMedianOutperform(RecordComparator comp, int[] arraySize, int sampleSize, ArrayFactory arrayFactory, PrintStream out, String title) {
+    static void testMedianOutperform(RecordComparator comp, Median medianCompare, int[] arraySize, int sampleSize, ArrayFactory arrayFactory, PrintStream out, String title) {
         Median[] medians = new Median[2];
         medians[0] = new QuickSelect(comp);
-        medians[1] = new JavaSort(comp);
+        medians[1] = medianCompare;
 
         double[][] times = new double[2][];
         double[][] comparisons = new double[2][];
@@ -207,7 +209,7 @@ public class Main {
         out.print("data = [sizes; ");
         for(Median median: medians) out.print(median.getClass().getName() + "_times; ");
         for(Median median: medians) out.print(median.getClass().getName() + "_comparisons; ");
-        out.print("];");
+        out.println("];");
     }
     
     static void testQuickSelectConstant(RecordComparator comp, int[] arraySize, int sampleSize, ArrayFactory arrayFactory, PrintStream out, String title) {
@@ -264,7 +266,7 @@ public class Main {
 
     public static void main(String[] args) throws Throwable {
         //region Init
-        PrintStream ps = new PrintStream(new BufferedOutputStream(new FileOutputStream("objective3.m")));
+        PrintStream ps = new PrintStream(new BufferedOutputStream(new FileOutputStream("objective4.m")));
         RecordComparator comp = new RecordComparator();
         Sort insertSort = new InsertionSort(comp), mergeSort = new MergeSort(comp),
                 heapSort = new HeapSort(comp), javaSort = new JavaSort(comp),
@@ -286,8 +288,10 @@ public class Main {
         //endregion
 
 //        testQuickSelect(quickSelect);
-        testMedianOutperform(comp, ARRAY_SIZES, SAMPLE_SIZE, ArrayFactory.getRandomFactory(), ps, "Objective 1");
-//        testQuickSelectConstant(comp, ARRAY_SIZES, SAMPLE_SIZE, ArrayFactory.getRandomFactory(), ps, "Objective 2");
+//        testMedianOutperform(comp, new JavaSort(comp), ARRAY_SIZES, SAMPLE_SIZE, ArrayFactory.getRandomFactory(), ps, "Objective 1");
+//        testQuickSelectConstant(comp, ARRAY_SIZES, SAMPLE_SIZE, ArrayFactory.getRandomFactory(), ps, "Objective 3");
+        testMedianOutperform(comp, new InsertionSort(comp), ARRAY_SIZES, SAMPLE_SIZE, ArrayFactory.getOrganPipeFactory(), ps, "Objective 4");
+        ps.println("plot(sizes, QuickSelect_comparisons-InsertionSort_comparisons, '-xb');grid on;");
 
         ps.close();
     }

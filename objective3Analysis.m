@@ -1,3 +1,13 @@
 
+%% times
+plot(sizes, times, '-ob');
+
 %% comparisons
-plot(sizes, QuickSelect_comparisons, '-ob', sizes, JavaSort_comparisons, '-xg');
+plot(sizes, comparisons, '-ob');
+
+%% postprocess
+hold on;
+grid on;
+ax = gca;
+ax.XScale = 'log';
+ax.YScale = 'log';
