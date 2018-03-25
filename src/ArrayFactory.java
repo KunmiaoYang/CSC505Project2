@@ -73,6 +73,7 @@ abstract public class ArrayFactory {
                 Integer[] array = randomFactory.createArray(size);
                 Arrays.sort(array, 0, size/2);
                 Arrays.sort(array, size/2, size);
+//                System.arraycopy(array, 0, array, size/2, size/2);
                 return array;
             }
 
@@ -92,6 +93,7 @@ abstract public class ArrayFactory {
             Integer[] createArray(int size) {
                 Integer[] array = randomFactory.createArray(size);
                 Arrays.sort(array, 0, size/2);
+                System.arraycopy(array, 0, array, size / 2, size / 2);
                 Arrays.sort(array, size/2, size, Collections.reverseOrder());
                 return array;
             }
@@ -107,7 +109,7 @@ abstract public class ArrayFactory {
     }
 
     public static void main(String[] args) {
-        ArrayFactory f = getReverseFactory();
+        ArrayFactory f = getOrganPipeFactory();
         System.out.println(Arrays.toString(f.createArray(8)));
     }
 }

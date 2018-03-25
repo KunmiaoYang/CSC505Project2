@@ -6,13 +6,17 @@ import java.util.*;
 
 public class Main {
     private static final int[] ARRAY_SIZES_4_SAW = {2,4,8,12,16,20,24,28,32,34,36,38,40,42,44,46};
-    private static final int[] ARRAY_SIZES = {1,2,3,4,5,6,7,8,9,10};
+//    private static final int[] ARRAY_SIZES = {1,2,3,4,5,6,7,8,9,10};
+    private static final int[] ARRAY_SIZES = {10,12,14,16,18,20,24,28,30,32,34,36,40,44,52,60,62,64,66,68,70,72,76,80,84,88,96,104,112,120,124,126,128,132,140,148};
+//    private static final int[] ARRAY_SIZES = {60, 120, 250, 500, 1000, 2000, 4000, 8000, 16000, 32000};
+//    private static final int[] ARRAY_SIZES = {64,128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768};
+//    private static final int[] ARRAY_SIZES = {16,32,64,128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768};
 //    private static final int[] ARRAY_SIZES = {500, 1000, 2000, 4000, 8000, 16000, 32000, 64000};
 //    private static final int[] ARRAY_SIZES = {100000, 200000, 400000};
     private static final int[] ARRAY_SIZES_FOR_INSERTION_SORT = {1000, 2000, 4000, 8000, 16000, 32000, 64000};
     private static final int[] SAMPLE_SIZES_FOR_INSERTION_SORT = {100, 100, 10, 10, 10, 10, 10};
     private static final int[] SAMPLE_SIZES_FOR_SORTED_INSERTION_SORT = {1024, 512, 256, 128, 64, 32, 16};
-    private static final int SAMPLE_SIZE = 10000;
+    private static final int SAMPLE_SIZE = 20;
     private static final String SEPARATOR_MAIN = " -------------------------------------- ";
     private static final String SEPARATOR_SUB = " ************************************* ";
 
@@ -266,7 +270,7 @@ public class Main {
 
     public static void main(String[] args) throws Throwable {
         //region Init
-        PrintStream ps = new PrintStream(new BufferedOutputStream(new FileOutputStream("objective4.m")));
+        PrintStream ps = new PrintStream(new BufferedOutputStream(new FileOutputStream("objective3.m")));
         RecordComparator comp = new RecordComparator();
         Sort insertSort = new InsertionSort(comp), mergeSort = new MergeSort(comp),
                 heapSort = new HeapSort(comp), javaSort = new JavaSort(comp),
@@ -289,9 +293,9 @@ public class Main {
 
 //        testQuickSelect(quickSelect);
 //        testMedianOutperform(comp, new JavaSort(comp), ARRAY_SIZES, SAMPLE_SIZE, ArrayFactory.getRandomFactory(), ps, "Objective 1");
-//        testQuickSelectConstant(comp, ARRAY_SIZES, SAMPLE_SIZE, ArrayFactory.getRandomFactory(), ps, "Objective 3");
-        testMedianOutperform(comp, new InsertionSort(comp), ARRAY_SIZES, SAMPLE_SIZE, ArrayFactory.getOrganPipeFactory(), ps, "Objective 4");
-        ps.println("plot(sizes, QuickSelect_comparisons-InsertionSort_comparisons, '-xb');grid on;");
+        testQuickSelectConstant(comp, ARRAY_SIZES, SAMPLE_SIZE, ArrayFactory.getOrganPipeFactory(), ps, "Objective 3");
+//        testMedianOutperform(comp, new InsertionSort(comp), ARRAY_SIZES, SAMPLE_SIZE, ArrayFactory.getOrganPipeFactory(), ps, "Objective 4");
+//        ps.println("plot(sizes, QuickSelect_comparisons-InsertionSort_comparisons, '-xb');grid on;");
 
         ps.close();
     }
